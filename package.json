@@ -1,0 +1,17 @@
+{
+  "name": "inventory-chat-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sanitized n8n workflow template for an AI inventory chat agent backed by Google Sheets.",
+  "scripts": {
+    "validate": "node scripts/validate-workflow.js"
+  },
+  "keywords": [
+    "n8n",
+    "ai-agent",
+    "inventory",
+    "google-sheets",
+    "automation"
+  ],
+  "license": "MIT"
+}

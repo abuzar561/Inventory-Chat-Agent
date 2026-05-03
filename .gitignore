@@ -1,0 +1,14 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# n8n local exports and credentials
+.n8n/
+credentials*.json
+secrets*.json
+
+# Node
+node_modules/
+npm-debug.log*

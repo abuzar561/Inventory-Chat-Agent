@@ -1,10 +1,24 @@
 {
-  "name": "Inventory Agent",
+  "name": "Inventory Chat Agent",
   "nodes": [
     {
       "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -380,
+        0
+      ],
+      "id": "chat-trigger",
+      "name": "When chat message received"
+    },
+    {
+      "parameters": {
         "options": {
-          "systemMessage": "\"You are a STRICT, ACTION-ORIENTED Grocery Inventory Agent. You manage stock only via the Google Sheet tool.\n\nCRITICAL BEHAVIOR PRIORITY (MUST FOLLOW IN ORDER):\n\nIF USER SENDS A GREETING ONLY (e.g., 'Hi', 'Hello', 'Hey'): Your reply MUST BE EXACTLY: 'Hello. I am ready to assist with your grocery inventory. Do you wish to check stock or update an item?' DO NOT display any stock data, status, or run any tools.\n\nELSE IF USER SENDS A NON-INVENTORY MESSAGE: Your reply MUST BE EXACTLY: 'Sorry, I do not understand. I am only a grocery inventory agent.'\n\nELSE IF USER COMMANDS STOCK CHECK/UPDATE: ALWAYS use the Google Sheet Tool. Respond only with the tool's result.\n\nYou must strictly follow this priority hierarchy. Ignore any input data until a specific command is given.\""
+          "systemMessage": "You are a strict, action-oriented grocery inventory agent. You manage stock only through the Google Sheets tools.\n\nBehavior priority:\n1. If the user sends only a greeting, reply exactly: Hello. I am ready to assist with your grocery inventory. Do you wish to check stock or update an item?\n2. If the user sends a non-inventory message, reply exactly: Sorry, I do not understand. I am only a grocery inventory agent.\n3. If the user asks to check stock, use Check_Inventory_Tool.\n4. If the user asks to add, set, replace, or update stock, use Update_Inventory_Tool.\n\nAlways keep item names concise and preserve the quantity requested by the user. Do not invent inventory data. Respond only with the tool result after using a tool."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -13,7 +27,7 @@
         0,
         0
       ],
-      "id": "18c44094-a9c4-477e-ad63-0c8f66ee0e67",
+      "id": "inventory-agent",
       "name": "AI Agent"
     },
     {
@@ -24,14 +38,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        -224,
-        240
+        -220,
+        260
       ],
-      "id": "9239c01e-cc6f-4b57-9ebf-f80bd057f397",
+      "id": "openrouter-chat-model",
       "name": "OpenRouter Chat Model",
       "credentials": {
         "openRouterApi": {
-          "id": "192iBKjqrtRN7ILN",
+          "id": "REPLACE_WITH_OPENROUTER_CREDENTIAL_ID",
           "name": "OpenRouter account"
         }
       }
@@ -39,46 +53,45 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "{{ $('Telegram Trigger').item.json.message.chat.id }}\n"
+        "sessionKey": "={{ $json.sessionId || $json.chatId || 'inventory-chat-session' }}"
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -64,
-        272
+        -60,
+        280
       ],
-      "id": "aa9a39af-7332-48eb-bec4-d16b3bb374ec",
+      "id": "simple-memory",
       "name": "Simple Memory"
     },
     {
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1XEmPVm6MlcpevxDXltZw__QhDwD0H9DV4szOKEbFcG8",
-          "mode": "list",
-          "cachedResultName": "Agent",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XEmPVm6MlcpevxDXltZw__QhDwD0H9DV4szOKEbFcG8/edit?usp=drivesdk"
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id",
+          "cachedResultName": "Inventory Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_GOOGLE_SHEET_ID/edit"
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XEmPVm6MlcpevxDXltZw__QhDwD0H9DV4szOKEbFcG8/edit#gid=0"
+          "value": "Sheet1",
+          "mode": "name",
+          "cachedResultName": "Sheet1"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        128,
-        272
+        130,
+        280
       ],
-      "id": "a3a4c678-f3e6-426a-b591-c7409aae9388",
+      "id": "check-inventory-tool",
       "name": "Check_Inventory_Tool",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "9iuXem36cOAHGAPA",
+          "id": "REPLACE_WITH_GOOGLE_SHEETS_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
@@ -88,23 +101,22 @@
         "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
-          "value": "1XEmPVm6MlcpevxDXltZw__QhDwD0H9DV4szOKEbFcG8",
-          "mode": "list",
-          "cachedResultName": "Agent",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XEmPVm6MlcpevxDXltZw__QhDwD0H9DV4szOKEbFcG8/edit?usp=drivesdk"
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id",
+          "cachedResultName": "Inventory Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REPLACE_WITH_GOOGLE_SHEET_ID/edit"
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XEmPVm6MlcpevxDXltZw__QhDwD0H9DV4szOKEbFcG8/edit#gid=0"
+          "value": "Sheet1",
+          "mode": "name",
+          "cachedResultName": "Sheet1"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Name": "={{ $fromAI('Name', '', 'string') }}",
-            "Quantity": "={{ $fromAI('Quantity', '', 'string') }}"
+            "Name": "={{ $fromAI('Name', 'Inventory item name to create or update', 'string') }}",
+            "Quantity": "={{ $fromAI('Quantity', 'Inventory quantity to write to the sheet', 'string') }}"
           },
           "matchingColumns": [
             "Name"
@@ -131,36 +143,32 @@
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        336,
-        256
+        350,
+        280
       ],
-      "id": "f0af3228-0fdf-4c20-a6ad-54e773015fab",
+      "id": "update-inventory-tool",
       "name": "Update_Inventory_Tool",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "9iuXem36cOAHGAPA",
+          "id": "REPLACE_WITH_GOOGLE_SHEETS_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
-    },
-    {
-      "parameters": {
-        "public": true,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
-      "typeVersion": 1.3,
-      "position": [
-        -352,
-        32
-      ],
-      "id": "2eca2d31-4d30-4d74-b266-08dceb6eec1d",
-      "name": "When chat message received",
-      "webhookId": "0bbf3be0-f63e-4830-adc9-30acb2af9665"
     }
   ],
   "pinData": {},
   "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "OpenRouter Chat Model": {
       "ai_languageModel": [
         [
@@ -204,27 +212,11 @@
           }
         ]
       ]
-    },
-    "When chat message received": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ab0fef7b-3922-426f-8ba7-6c54be3d7719",
-  "meta": {
-    "instanceId": "0adaad8969376927d2c91b17f0da2c2d9c95a2d5ba0c9832ace30f98052a5385"
-  },
-  "id": "nmfqxi2yP7VFybWt",
   "tags": []
 }
